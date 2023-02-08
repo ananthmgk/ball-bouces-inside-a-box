@@ -10,8 +10,10 @@
   </head>
   <body>
     <canvas id="canvas" width="500" height="500"></canvas>
+    <h1 id="points">Points:0</h1>
     <script>
-      const canvas = document.getElementById('canvas');
+      const canvas = document.querySelector('#canvas');
+      const points = document.querySelector('#points');
       const ctx = canvas.getContext('2d');
       const ballRadius = 20;
       const handleWidth = 80;
@@ -26,6 +28,7 @@
       let handleYAxis = canvas.height - handleHeight;
       let dx;
       let dy;
+      let count = 0;
 
       function drawHandle() {
         ctx.clearRect(
@@ -51,6 +54,8 @@
 
       function resetGame() {
         isDragging = false;
+        count = 0;
+        points.innerHTML = `Points:${count}`;
         cancelAnimationFrame(animation);
         ballXAxis = canvas.width / 2;
         ballYAxis = canvas.height - ballRadius - handleHeight;
@@ -84,7 +89,8 @@
           ballXAxis > handleXAxis &&
           ballXAxis < handleXAxis + handleWidth
         ) {
-          console.count('point');
+          count += 1;
+          points.innerHTML = `Points:${count - 1}`;
         } else if (ballYAxis > 465) {
           cancelAnimationFrame(animation);
           isDragging = false;
@@ -99,7 +105,10 @@
 
       canvas.addEventListener('mousedown', () => {
         isDragging = true;
-        if (ballXAxis == canvas.width / 2) {
+        if (
+          ballXAxis == canvas.width / 2 &&
+          handleXAxis == canvas.width / 2 - handleWidth / 2
+        ) {
           canvas.style.cursor = 'grabbing';
           dx = 5 * (Math.round(Math.random()) * 2 - 1); // to get -5 or 5.
           dy = Math.floor(Math.random() * 5 + 1); // to get random number between 1 - 5.
@@ -111,6 +120,14 @@
       });
 
       window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        handleXAxis = e.clientX - handleWidth / 2;
+        handleYAxis = canvas.height - handleHeight;
+        drawHandle();
+      });
+
+      window.addEventListener('touchmove', (e) => {
         if (!isDragging) return;
 
         handleXAxis = e.clientX - handleWidth / 2;
